@@ -1,0 +1,88 @@
+﻿@model MvcSiteMapProvider.Web.Html.Models.MenuHelperModel
+@using System.Web.Mvc.Html
+@using MvcSiteMapProvider.Web.Html.Models
+
+@foreach (SiteMapNodeModel node in Model.Nodes)
+{
+    if (node.IsRootNode)
+    {
+        continue;
+    }
+    string url = node.IsClickable ? node.Url : "#";
+
+    // Ignore any nodes with custom hidden attribute
+    int countOfHiddenNodes = node.Children.Count(s => s.Attributes.Any(a => a.Key == "hidden"));
+    if (node.Children.Count - countOfHiddenNodes == 0)
+    {
+        <li class="@GetCssClass(node)">
+            <a href="@url"> @RenderIcon(node) @node.Title </a>
+        </li>
+    }
+    else
+    {
+        string css = GetCssClassForLi(node);
+        <li class="dropdown @css">
+            <a href="#" class="dropdown-toggle" aria-expanded="false" data-toggle="dropdown">
+                @RenderIcon(node)
+                @node.Title<b class="caret"></b>
+            </a>
+            @DropDownMenu(node.Children)
+        </li>
+    }
+}
+
+@* Two level max, not doing recursion *@
+@helper DropDownMenu(SiteMapNodeModelList nodeList)
+{
+    <ul class="dropdown-menu">
+        @foreach (SiteMapNodeModel node in nodeList)
+        {
+            string url = node.IsClickable ? node.Url : "#";
+            @* We can show active node here*@
+            <li>
+                <a href="@url" class="@GetCssClass(node)">
+                    @RenderIcon(node)
+                    @node.Title
+                </a>
+            </li>
+        }
+    </ul>
+}
+
+@helper RenderIcon(SiteMapNodeModel node)
+{
+// I wish SiteMap provider had tag attribute. It is possible to add custom attribute but it will be
+// visible in route.
+// TODO: this is actually not true, custom attributes should be specified in web.config in order to be excluded from route
+    if (!string.IsNullOrEmpty(node.ImageUrl))
+    {
+        string cssClass = node.ImageUrl.Substring(1);
+            <i class="glyphicon @cssClass"></i>
+    }
+}
+
+@functions
+{
+    string GetCssClass(SiteMapNodeModel node)
+    {
+        bool match = Html.RouteMatch(node.Action, node.Controller);
+        if (!match)
+        {
+            // Since menu item can have hidden nodes, it is possible that we failed to match on parent
+            // and now one of those hidden nodes is active.
+            match = AnyActiveChildren(node);
+        }
+
+        return match ? "active" : string.Empty;
+    }
+
+    string GetCssClassForLi(SiteMapNodeModel node)
+    {
+        return AnyActiveChildren(node) ? "active" : string.Empty;
+    }
+
+    bool AnyActiveChildren(SiteMapNodeModel node)
+    {
+        return node.Descendants.Any(s => Html.RouteMatch(s.Action, s.Controller));
+    }
+}

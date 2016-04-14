@@ -1,0 +1,1 @@
+﻿Wijmo angular is not on bower :(

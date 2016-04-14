@@ -1,0 +1,14 @@
+﻿@section JavascriptInHead
+{
+    @Scripts.Render("~/js/app.js")
+    @Scripts.Render("~/js/dashboard/dashboard-service.js")
+    @Scripts.Render("~/js/dashboard/dashboard-controller.js")
+}
+
+<div ng-app="dashboardModule" ng-controller="DashboardController">
+    <wj-flex-chart items-source="events" chart-type="LineSymbols" binding-x="time">
+        <wj-flex-chart-axis wj-property="axisX" format="mm:ss" title="Time"></wj-flex-chart-axis>
+        <wj-flex-chart-axis wj-property="axisY" min="0" max="100" title="Count"></wj-flex-chart-axis>
+        <wj-flex-chart-series name="Fatal" binding="fatalCount"></wj-flex-chart-series>
+    </wj-flex-chart>
+</div>
