@@ -1,14 +1,32 @@
 ﻿@section JavascriptInHead
 {
     @Scripts.Render("~/js/app.js")
-    @Scripts.Render("~/js/dashboard/dashboard-service.js")
+    @Scripts.Render("~/Scripts/jquery.signalR-2.2.0.js")
     @Scripts.Render("~/js/dashboard/dashboard-controller.js")
+    @Scripts.Render("~/signalr/hubs")
 }
 
+<style>
+    .huge {
+     font-size: 40px;
+    }
+</style>
+
 <div ng-app="dashboardModule" ng-controller="DashboardController">
-    <wj-flex-chart items-source="events" chart-type="LineSymbols" binding-x="time">
-        <wj-flex-chart-axis wj-property="axisX" format="mm:ss" title="Time"></wj-flex-chart-axis>
-        <wj-flex-chart-axis wj-property="axisY" min="0" max="100" title="Count"></wj-flex-chart-axis>
+    <div>
+        <div class="huge">{{perMinute}}</div>
+        <div>Events per minute</div>
+    </div>
+
+    <p></p>
+
+    <wj-flex-chart items-source="trafficData" chart-type="Area" stacking="Stacked" binding-x="time">
+        <wj-flex-chart-axis wj-property="axisX" format="mm:ss"></wj-flex-chart-axis>
+        <wj-flex-chart-axis wj-property="axisY" min="0" title="Count"></wj-flex-chart-axis>
         <wj-flex-chart-series name="Fatal" binding="fatalCount"></wj-flex-chart-series>
+        <wj-flex-chart-series name="Error" binding="errorCount"></wj-flex-chart-series>
+        <wj-flex-chart-series name="Warrning" binding="warrningCount"></wj-flex-chart-series>
+        <wj-flex-chart-series name="Info" binding="infoCount"></wj-flex-chart-series>
+        <wj-flex-chart-series name="Debug" binding="debugCount"></wj-flex-chart-series>
     </wj-flex-chart>
-</div>
+ </div>
